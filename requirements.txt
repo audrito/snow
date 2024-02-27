@@ -1,0 +1,6 @@
+langchain
+llama-cpp-python
+discord
+redis
+huggingface_hub
+spacy
