@@ -40,7 +40,7 @@ class MyClient(discord.Client):
         if self.user != message.author:
             session_id = str(message.author.id)
             history = RedisChatMessageHistory(session_id=session_id, url="redis://localhost:6379")
-            memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
+            memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=3996, chat_memory=history)
 
             if message.channel.type == discord.ChannelType.private or self.user in message.mentions:
                 system_message = "Act as a good, supportive and romantic girlfriend."
