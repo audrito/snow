@@ -12,7 +12,9 @@ from cleanput import fix_short_forms
 
 # Langchain Settings
 
-llm = LlamaCpp(model_path=MODEL_PATH, verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.8, repeat_penalty=1.18)
+MODEL_PATH = "/content/snow/models/models--TheBloke--Thespis-Mistral-7B-v0.6-GGUF/snapshots/4f592294df9562c246e632dec8445d3965d84baa/thespis-mistral-7b-v0.6.Q8_0.gguf"
+
+llm = LlamaCpp(model_path=MODEL_PATH,n_gpu_layers=80, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.9, top_p=0.37, top_k=100, repeat_penalty=1.18)
 
 # Discord Settings
 class MyClient(discord.Client):
