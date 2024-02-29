@@ -3,16 +3,16 @@ import discord
 import asyncio
 from langchain_community.llms import LlamaCpp
 from langchain.prompts import PromptTemplate
-from langchain.memory import ConversationTokenBufferMemory
-from langchain.memory import RedisChatMessageHistory
+# from langchain.memory import ConversationTokenBufferMemory
+# from langchain.memory import RedisChatMessageHistory
+from RefactoredModules.ConversationTokenBufferMemory import ConversationTokenBufferMemory
+from RefactoredModules.RedisChatMessageHistory import RedisChatMessageHistory
 from langchain.chains import LLMChain
 from cleanput import fix_short_forms
 
-
 # Langchain Settings
 
-
-llm = LlamaCpp(model_path=model_path, verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.8, repeat_penalty=1.18)
+llm = LlamaCpp(model_path=MODEL_PATH, verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.8, repeat_penalty=1.18)
 
 # Discord Settings
 class MyClient(discord.Client):
@@ -42,7 +42,7 @@ class MyClient(discord.Client):
             memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
 
             if message.channel.type == discord.ChannelType.private or self.user in message.mentions:
-                system_message = "You are a good AI assistant"
+                system_message = "Act as a good, supportive and romantic girlfriend."
 
                 template = '''Previous conversation:
                 {history}
