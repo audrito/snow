@@ -13,13 +13,23 @@ from cleanput import fix_short_forms
 
 DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 
-redis_url = "redis://localhost:6379"
+redis_password = os.environ.get("REDIS_PASSWORD")
 
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_host = 'redis-13761.c1.us-central1-2.gce.cloud.redislabs.com'
+
+redis_port = 13761
+
+redis_url = f'redis://:{redis_password}@{redis_host}:{redis_port}'
+
+r = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, password=redis_password)
+
+# redis_url = "redis://localhost:6379"
+
+# r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 
 # Langchain Settings
-llm = LlamaCpp(model_path="E:\llama.cpp\synthia-7b-v2.0-16k.Q4_K_M.gguf", verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.9, repeat_penalty=1.18)
+llm = LlamaCpp(model_path="C:\espis-mistral-7b-v0.6.Q6_K.gguf", verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.9, repeat_penalty=1.18)
 
 # Discord Settings
 class MyClient(discord.Client):
