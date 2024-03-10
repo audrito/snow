@@ -27,9 +27,8 @@ r = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, p
 
 # r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-
 # Langchain Settings
-llm = LlamaCpp(model_path="C:\espis-mistral-7b-v0.6.Q6_K.gguf", verbose=False, n_ctx=2048, n_batch=512, max_tokens=-1, temperature=0.9, repeat_penalty=1.18)
+llm = LlamaCpp(model_path=model_path, verbose=False, n_ctx=4096, n_batch=512, max_tokens=-1, temperature=0.1, repeat_penalty=1.2)
 
 # Discord Settings
 class MyClient(discord.Client):
@@ -45,8 +44,12 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         print(f'Message from {message.author}: {message.content}')
         if self.user != message.author:
+            user_id = str(message.author.id)
+            if not await r.exists([f'user:{user_id}']):
+                await r.hset(f'user:{user_id}', {'selected_character': 895743})
+                print(f'New user profile created for {message.author.id}!')
             await self.request_queue.put(message)
-
+                
     async def process_requests(self):
         while True:
             # Get one message from the queue
@@ -56,26 +59,22 @@ class MyClient(discord.Client):
 
     async def process_request(self, message):
         if self.user != message.author:
-            session_id = str(message.author.id)
-            history = RedisChatMessageHistory(session_id=session_id, url=redis_url)
-            memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
-
             if message.channel.type == discord.ChannelType.private or self.user in message.mentions:
-                try:
-                    character_id = r.hget(f'user:{session_id}', 'selected_character')
-                    character_data = r.json().get(f'character:{character_id}')
-                    system_message = f"Act and roleplay as the following character.\n{character_data['data']['description']}"
-                except:
-                    system_message = "Act and roleplay as the following character."
-
+                user_id = str(message.author.id)
+                character_id = await r.hget(f'user:{user_id}', 'selected_character')
+                session_id = ':'.join([user_id, 'character', character_id])
+                history = RedisChatMessageHistory(session_id=session_id, url=redis_url)
+                memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
+                character_data = await r.json.get(f'character:{character_id}')
+                cleaned_character_data = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['description'])
+                system_message = f"Continue the conversation by generating a single message while roleplaying the following character.{cleaned_character_data}"
                 template = '''Previous conversation:
 {history}
-Human: {question}
-AI:'''
+{user}:{question}
+{char}:'''
 
                 new_template = "\n".join([system_message, template])
-
-                prompt = PromptTemplate.from_template(new_template)
+                prompt = PromptTemplate(template=new_template, input_variables=["question"], partial_variables={"user": "you", "char": "Katy"})
                 conversation = LLMChain(
                     llm=llm,
                     prompt=prompt,
@@ -84,7 +83,13 @@ AI:'''
                 )
                 # Show typing... indicator
                 async with message.channel.typing():
-                    response = await conversation.arun({"question": (message.content)})
+                    cleaned_message = fix_short_forms(message.content)
+                    if not cleaned_message.strip():
+                        response = random_replies.blank_message_reply()
+                        history.add_user_message(cleaned_message)
+                        history.add_ai_message(response)
+                    else:
+                        response = await conversation.arun({'question':cleaned_message})
                 channel = message.channel
                 await channel.send(response)
 
@@ -103,7 +108,7 @@ AI:'''
                     user_id = str(payload.user_id)
 
                     # Update the hash for the user with the extracted 4 character code
-                    r.hset(f'user:{user_id}', 'selected_character', code)
+                    await r.hset(f'user:{user_id}', 'selected_character', code)
 
 intents = discord.Intents.default()
 intents.reactions = True
