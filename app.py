@@ -1,7 +1,7 @@
 import os
 import json
 import re
-import redis
+import coredis
 import discord
 import asyncio
 from langchain_community.llms import LlamaCpp
