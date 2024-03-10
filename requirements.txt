@@ -3,3 +3,4 @@ discord
 redis
 huggingface_hub
 spacy
+coredis
