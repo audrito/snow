@@ -21,7 +21,7 @@ redis_port = 13761
 
 redis_url = f'redis://:{redis_password}@{redis_host}:{redis_port}'
 
-r = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, password=redis_password)
+r = coredis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, password=redis_password)
 
 # redis_url = "redis://localhost:6379"
 
