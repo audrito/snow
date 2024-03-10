@@ -28,7 +28,7 @@ r = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, p
 # r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # Langchain Settings
-llm = LlamaCpp(model_path=model_path, verbose=False, n_ctx=4096, n_batch=512, max_tokens=-1, temperature=1, repeat_penalty=1.2)
+llm = LlamaCpp(model_path=model_path, n_gpu_layers=70, verbose=False, n_ctx=4096, n_batch=512, max_tokens=-1, temperature=1, repeat_penalty=1.2)
 
 # Discord Settings
 class MyClient(discord.Client):
