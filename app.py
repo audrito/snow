@@ -11,9 +11,9 @@ from ConversationTokenBufferMemory import ConversationTokenBufferMemory
 from langchain.chains import LLMChain
 from cleanput import fix_short_forms
 
-DISCORD_BOT_TOKEN = "MTE3NjIyOTEzMTEwNTYwMzcxNA.Ggj5TX.dVRB91BD3XEjq9DT_Xz3zpj73QW_wuQ27cm8cw"
+DISCORD_BOT_TOKEN = 
 
-redis_password = "sSrLM5DbWr0zYb2KJnJHLDueSLc328VJ"
+redis_password = 
 
 redis_host = 'redis-13761.c1.us-central1-2.gce.cloud.redislabs.com'
 
