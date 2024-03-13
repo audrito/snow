@@ -27,7 +27,7 @@ r = coredis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True,
 model_path = '/content/snow/models/models--TheBloke--Thespis-Mistral-7B-v0.6-GGUF/snapshots/4f592294df9562c246e632dec8445d3965d84baa/thespis-mistral-7b-v0.6.Q8_0.gguf'
 
 # Langchain Settings
-llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=4096, n_batch=512, max_tokens=-1, temperature=1.4, repeat_penalty=1.25, top_k=2)
+llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=4096, n_batch=512, max_tokens=-1, temperature=1.4, repeat_penalty=1.25, top_k=20)
 
 # Discord Settings
 class MyClient(discord.Client):
