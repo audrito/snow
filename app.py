@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import re
 import coredis
@@ -11,9 +12,9 @@ from ConversationTokenBufferMemory import ConversationTokenBufferMemory
 from langchain.chains import LLMChain
 from cleanput import fix_short_forms
 
-DISCORD_BOT_TOKEN = 
+DISCORD_BOT_TOKEN = sys.argv[1]
 
-redis_password = 
+redis_password = sys.argv[2]
 
 redis_host = 'redis-13761.c1.us-central1-2.gce.cloud.redislabs.com'
 
