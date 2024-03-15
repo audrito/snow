@@ -28,7 +28,7 @@ r = coredis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True,
 
 
 # Langchain Settings
-llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=4096, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
+llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=8136, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
 
 # Discord Settings
 class MyClient(discord.Client):
@@ -64,7 +64,7 @@ class MyClient(discord.Client):
                 character_id = await r.hget(f'user:{user_id}', 'selected_character')
                 session_id = ':'.join([user_id, 'character', character_id])
                 history = RedisChatMessageHistory(session_id=session_id, url=redis_url)
-                memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
+                memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=8136, chat_memory=history)
                 character_data = await r.json.get(f'character:{character_id}')
                 cleaned_character_data = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['description'])
                 system_message = f"Continue the conversation by generating a single message while roleplaying the following character.{cleaned_character_data}"
