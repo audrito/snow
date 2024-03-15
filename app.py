@@ -16,6 +16,8 @@ DISCORD_BOT_TOKEN = sys.argv[1]
 
 redis_password = sys.argv[2]
 
+model_path = sys.argv[3]
+
 redis_host = 'redis-13761.c1.us-central1-2.gce.cloud.redislabs.com'
 
 redis_port = 13761
@@ -24,7 +26,6 @@ redis_url = f'redis://:{redis_password}@{redis_host}:{redis_port}'
 
 r = coredis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True, password=redis_password)
 
-model_path = '/content/snow/models/models--TheBloke--Thespis-Mistral-7B-v0.6-GGUF/snapshots/4f592294df9562c246e632dec8445d3965d84baa/thespis-mistral-7b-v0.6.Q8_0.gguf'
 
 # Langchain Settings
 llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=4096, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
