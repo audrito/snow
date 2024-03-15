@@ -52,9 +52,9 @@ class ConversationTokenBufferMemory(BaseChatMemory):
         # Prune buffer if it exceeds max token limit
         buffer = self.chat_memory.messages
         curr_buffer_length = self.llm.get_num_tokens_from_messages(buffer)
-        if curr_buffer_length + 800 >= self.max_token_limit:
+        if curr_buffer_length + 1000 >= self.max_token_limit:
             pruned_memory = []
-            while curr_buffer_length + 800 > self.max_token_limit:
+            while curr_buffer_length + 1000 > self.max_token_limit:
                 pruned_memory.append(buffer.pop(0))
                 curr_buffer_length = self.llm.get_num_tokens_from_messages(buffer)
             self.chat_memory.clear()
