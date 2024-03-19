@@ -4,3 +4,7 @@ redis
 huggingface_hub
 spacy
 coredis
+ujson
+selenium
+webdriver-manager
+Pillow
