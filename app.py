@@ -35,7 +35,7 @@ intents.messages = True
 intents.message_content = True
 
 # Langchain Settings
-llm = Llama(model_path=model_path, chat_format='chatml', verbose=False, n_ctx=4096, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
+llm = Llama(model_path=model_path, chat_format='llama-2', n_gpu_layers=100, verbose=False, n_ctx=16384, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3)
 
 def is_valid_message(message):
     if message.attachments or message.stickers:
@@ -80,7 +80,7 @@ class MyClient(commands.Bot, discord.Client):
                 user_id = str(message.author.id)
                 character_id = await r.hget(f'user:{user_id}', 'selected_character')
                 session_id = ':'.join([user_id, 'character', character_id])
-                history = await RedisHistory.create(redis_password, llm, session_id=session_id, max_token_limit=4096)
+                history = await RedisHistory.create(redis_password, llm, session_id=session_id, max_token_limit=16384)
                 character_data = await r.json.get(f'character:{character_id}')
 
                 # cleaned_character_data = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['description'])
