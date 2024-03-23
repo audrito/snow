@@ -1,4 +1,3 @@
-langchain
 discord
 redis
 huggingface_hub
