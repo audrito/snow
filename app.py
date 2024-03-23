@@ -7,11 +7,8 @@ import coredis
 import discord
 from discord.ext import commands
 import asyncio
-from langchain_community.llms import LlamaCpp
-from langchain.prompts import PromptTemplate
-from langchain.memory import RedisChatMessageHistory
-from ConversationTokenBufferMemory import ConversationTokenBufferMemory
-from langchain.chains import LLMChain
+from llama_cpp import Llama
+from redis_history import RedisHistory
 from cleanput import fix_short_forms
 import random_replies
 import autotext
@@ -38,7 +35,7 @@ intents.messages = True
 intents.message_content = True
 
 # Langchain Settings
-llm = LlamaCpp(model_path=model_path, n_gpu_layers=120, verbose=False, n_ctx=8136, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
+llm = Llama(model_path=model_path, chat_format='chatml', verbose=False, n_ctx=4096, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
 
 def is_valid_message(message):
     if message.attachments or message.stickers:
@@ -83,26 +80,19 @@ class MyClient(commands.Bot, discord.Client):
                 user_id = str(message.author.id)
                 character_id = await r.hget(f'user:{user_id}', 'selected_character')
                 session_id = ':'.join([user_id, 'character', character_id])
-                history = RedisChatMessageHistory(session_id=session_id, url=redis_url)
-                memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=2048, chat_memory=history)
+                history = await RedisHistory.create(redis_password, llm, session_id=session_id, max_token_limit=4096)
                 character_data = await r.json.get(f'character:{character_id}')
-                cleaned_character_data = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['description'])
+
+                # cleaned_character_data = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['description'])
+
+                cleaned_character_data = re.sub('{{user}}', 'you', re.sub('{{char}}', 'Katy', character_data['data']['description']))
+
                 if character_data['data']['first_mes']:
                     cleaned_character_first_mes = re.sub(r'\{\{(.*?)\}\}', r'{\1}', character_data['data']['first_mes'])
                     cleaned_character_first_mes = ":".join (['AI', cleaned_character_first_mes])
                 else:
                     cleaned_character_first_mes = ""
-                system_message = f"Continue the conversation by generating a single message while roleplaying the following character.{cleaned_character_data}\n{cleaned_character_first_mes}\nPrevious Conversation: {cleaned_character_first_mes}"
-                template = "{history}\n{user}:{question}\n{char}:"
-
-                new_template = "\n".join([system_message, template])
-                prompt = PromptTemplate(template=new_template, input_variables=["question"], partial_variables={"user": "you", "char": "Katy"})
-                conversation = LLMChain(
-                    llm=llm,
-                    prompt=prompt,
-                    verbose=False,
-                    memory=memory
-                )
+                system_message = {'role': 'system', 'content': f"Continue while roleplaying the following character.{cleaned_character_data}"}
                 # Show typing... indicator
                 async with message.channel.typing():
                     cleaned_message = fix_short_forms(message.content)
@@ -111,9 +101,27 @@ class MyClient(commands.Bot, discord.Client):
                         history.add_user_message(cleaned_message)
                         history.add_ai_message(response)
                     else:
-                        response = await conversation.arun({'question':cleaned_message})
+                        messages = await history.get_history()
+                        if not messages:
+                            messages.append(system_message)
+                            messages.append({'role': 'user', 'content': cleaned_message})
+                        else:
+                            messages = await history.truncate_history(messages)
+                            messages.insert(0, system_message)
+                            messages.append({'role': 'user', 'content': cleaned_message})
+
+                        response = await asyncio.get_event_loop().run_in_executor(None, llm.create_chat_completion, messages)
+                        assistant_reply = response['choices'][0]['message']['content']
+
+                        while not assistant_reply.strip():
+                            response = await asyncio.get_event_loop().run_in_executor(None, llm.create_chat_completion, messages)
+                            assistant_reply = response['choices'][0]['message']['content']
+
+                        await history.add_message('user', cleaned_message)
+                        await history.add_message('assistant', assistant_reply)
+
                 channel = message.channel
-                await channel.send(response)
+                await channel.send(assistant_reply)
 
     async def on_raw_reaction_add(self, payload):
         user_id = str(payload.user_id)
