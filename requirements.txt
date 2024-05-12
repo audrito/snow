@@ -1,4 +1,3 @@
-langchain
 llama-cpp-python
 discord
 redis
@@ -14,3 +13,4 @@ transformers
 torch
 torchvision
 torchaudio
+astrapy
