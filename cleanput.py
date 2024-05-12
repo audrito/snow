@@ -1,4 +1,7 @@
 import re
+import textwrap
+
+
 try:
     import spacy
 except:
@@ -79,9 +82,9 @@ short_form_dict = {
     "rn":"right now",
     "gd":"good",
     "nb":"not bad",
+    "yall":"you all",
+    "y'all":"you all",
     "vid":"video",
-    "pic":"photo",
-    "pics":"photos",
     "wbu":"what about you",
     "hbu":"how about you",
     "hru":"how are you",
