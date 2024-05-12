@@ -25,16 +25,9 @@ from rate_limiter import RateLimiter
 
 load_dotenv()
 
-DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+DISCORD_BOT_TOKEN = sys.argv[1]
 
-MODEL_PATH = os.getenv('MODEL_PATH')
-
-# redis_password = os.environ.get("REDIS_PASSWORD")
-# redis_host = 'redis-13761.c1.us-central1-2.gce.cloud.redislabs.com'
-# redis_port = 13761
-# redis_url = f"redis://:{redis_password}@{redis_host}:{redis_port}"
-
-# r = coredis.Redis(host=redis_host, port=redis_port, password=redis_password, db=0, decode_responses=True)
+MODEL_PATH = sys.argv[3]
 
 llm = Llama(model_path=MODEL_PATH, chat_format='alpaca', n_gpu_layers=20, verbose=True, n_ctx=4096, n_batch=1024, max_tokens=-1, temperature=1.5, repeat_penalty=1.3, top_k=20)
 
