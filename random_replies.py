@@ -1,4 +1,7 @@
 import random
+import string
+import emoji
+import langdetect
 
 # List of funny replies for blank messages
 reply_list = (
@@ -54,9 +57,25 @@ reply_list = (
     "Is this a test of my observation skills?"
 )
 
+emoji_replies = (
+    "I'm sorry, but I don't speak emoji. Could you please use words?",
+    "Emojis are fun, but I need actual words to communicate with you.",
+    "I see you're trying to communicate with me using hieroglyphics. Let me get my decoder ring!",
+    "I'm not sure what those symbols mean, but I'm sure you can express yourself better with words."
+)
 
-def blank_message_reply(reply_list=reply_list):
-    return random.choice(reply_list)
+def validate(text):
+    if all(char in string.punctuation + string.digits or char in emoji.EMOJI_DATA for char in text):
+        return random.choice(emoji_replies)
+
+    result = langdetect.detect_langs("hey man, i'm doing great.")[0]
+
+    if not (result.lang == 'en' or result.prob < 0.88):
+        return "I don't understand languages other than English yet."
+    elif not text.strip():
+        return random.choice(reply_list)
+    else:
+        return True
 
 
 if __name__ == "__main__":
