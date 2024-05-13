@@ -2,7 +2,7 @@ import requests
 import sys
 
 API_URL = "https://api-inference.huggingface.co/models/NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
-headers = {"Authorization": sys.argv[7]}
+headers = {"Authorization": sys.argv[5]}
 
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
