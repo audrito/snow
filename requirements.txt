@@ -1,6 +1,4 @@
-llama-cpp-python
 discord
-redis
 coredis
 spacy
 ujson
