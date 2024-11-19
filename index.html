@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Bot Authorization</title>
+    <title>Snow Bot Authorization</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,25 +47,12 @@
             color: #f04747;
         }
 
-        #username {
-            font-weight: bold;
-            color: #7289da;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #7289da;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin: 1rem auto;
+        #debug-info {
+            font-size: 0.8rem;
+            color: #72767d;
+            margin-top: 1rem;
+            word-break: break-all;
             display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .button {
@@ -83,45 +70,67 @@
         .button:hover {
             background-color: #677bc4;
         }
+
+        #show-debug {
+            font-size: 0.8rem;
+            color: #72767d;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Discord Bot Authorization</h1>
-        <div id="loading" class="spinner"></div>
-        <div id="status" class="status">Processing authorization...</div>
+        <h1>Snow Bot Authorization</h1>
+        <div id="status" class="status">Checking authorization...</div>
         <div id="message"></div>
         <a href="discord://." class="button" style="display: none;" id="returnButton">Return to Discord</a>
+        
+        <!-- Debug section -->
+        <span id="show-debug" onclick="toggleDebug()">Show Debug Info</span>
+        <div id="debug-info"></div>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
-        const loading = document.getElementById('loading');
+        const error = urlParams.get('error');
+        const error_description = urlParams.get('error_description');
+        
         const status = document.getElementById('status');
         const message = document.getElementById('message');
         const returnButton = document.getElementById('returnButton');
+        const debugInfo = document.getElementById('debug-info');
+
+        // Update debug info
+        debugInfo.innerHTML = `
+            Current URL: ${window.location.href}<br>
+            Code: ${code || 'none'}<br>
+            Error: ${error || 'none'}<br>
+            Error Description: ${error_description || 'none'}
+        `;
 
         if (code) {
-            loading.style.display = 'block';
             status.textContent = 'Authorization successful!';
             status.classList.add('success');
             message.innerHTML = 'You can now close this window and return to Discord.';
             returnButton.style.display = 'inline-block';
-        } else {
+        } else if (error) {
             status.textContent = 'Authorization failed!';
             status.classList.add('error');
-            message.innerHTML = 'No authorization code received. Please try again.';
+            message.innerHTML = `Error: ${error_description || error}`;
+        } else {
+            status.textContent = 'No authorization code received';
+            status.classList.add('error');
+            message.innerHTML = 'Please try authorizing the bot again.';
         }
 
-        // Optional: Auto-close after success (uncomment if desired)
-        /*
-        if (code) {
-            setTimeout(() => {
-                window.close();
-            }, 3000);
+        function toggleDebug() {
+            const debug = document.getElementById('debug-info');
+            debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
         }
-        */
     </script>
 </body>
 </html>
