@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Authorization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #36393f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #2f3136;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+        }
+
+        h1 {
+            color: #7289da;
+            margin-bottom: 1rem;
+        }
+
+        .status {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 4px;
+            background-color: #40444b;
+        }
+
+        .success {
+            color: #43b581;
+        }
+
+        .error {
+            color: #f04747;
+        }
+
+        #username {
+            font-weight: bold;
+            color: #7289da;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #7289da;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .button:hover {
+            background-color: #677bc4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Discord Bot Authorization</h1>
+        <div id="loading" class="spinner"></div>
+        <div id="status" class="status">Processing authorization...</div>
+        <div id="message"></div>
+        <a href="discord://." class="button" style="display: none;" id="returnButton">Return to Discord</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const loading = document.getElementById('loading');
+        const status = document.getElementById('status');
+        const message = document.getElementById('message');
+        const returnButton = document.getElementById('returnButton');
+
+        if (code) {
+            loading.style.display = 'block';
+            status.textContent = 'Authorization successful!';
+            status.classList.add('success');
+            message.innerHTML = 'You can now close this window and return to Discord.';
+            returnButton.style.display = 'inline-block';
+        } else {
+            status.textContent = 'Authorization failed!';
+            status.classList.add('error');
+            message.innerHTML = 'No authorization code received. Please try again.';
+        }
+
+        // Optional: Auto-close after success (uncomment if desired)
+        /*
+        if (code) {
+            setTimeout(() => {
+                window.close();
+            }, 3000);
+        }
+        */
+    </script>
+</body>
+</html>
